@@ -58,6 +58,17 @@ anim_prev_arr = []
 prev_step_idx = -1    
 
 running = True
+def reset_sort():
+    global arr, steps, step_idx, playing, timer, animating, anim_timer, prev_step_idx
+    arr = list(range(1, N + 1))
+    random.shuffle(arr)
+    steps = get_steps(arr)
+    step_idx = 0
+    playing = False
+    timer = 0
+    animating = False
+    anim_timer = 0
+    prev_step_idx = -1
 while running:
     dt = clock.tick(60)
     for e in pygame.event.get():
