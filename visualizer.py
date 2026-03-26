@@ -2,7 +2,6 @@
 import pygame, subprocess, random
 
 WIDTH, HEIGHT = 800, 500
-N = 20
 ENGINE = "engine/sort_engine.exe"
 
 # Get sorting steps from C++ program
