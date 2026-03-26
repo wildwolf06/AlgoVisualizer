@@ -108,6 +108,25 @@ while running:
         if e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
             reset_sort()
             state = STATE_SORT
+    # --- SORT SCREEN ---
+    elif state == STATE_SORT:
+            if e.type == pygame.KEYDOWN:
+                if e.key == pygame.K_SPACE:
+                    playing = not playing
+                if e.key == pygame.K_RIGHT and not playing and not animating:
+                    if step_idx < len(steps) - 1:
+                        step_idx += 1
+                        start_swap_anim(step_idx)
+                if e.key == pygame.K_LEFT and not playing:
+                    if step_idx > 0:
+                        step_idx -= 1
+                if e.key == pygame.K_UP:
+                    speed = max(MIN_SPEED, speed - 20)
+                if e.key == pygame.K_DOWN:
+                    speed = min(MAX_SPEED, speed + 20)
+                if e.key == pygame.K_r:
+                    state = STATE_SELECT
+                    playing = False
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
