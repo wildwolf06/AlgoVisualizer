@@ -27,16 +27,17 @@ title_font = pygame.font.SysFont("Consolas", 22, bold=True)
 slider_font = pygame.font.SysFont("Consolas", 14)
 clock = pygame.time.Clock()
 
-# Init
-arr = list(range(1, N + 1))
-random.shuffle(arr)
-steps = get_steps(arr)
-step_idx = 0
-playing = False
-timer = 0
-speed = 100  # ms per step (lower = faster)
-MIN_SPEED = 20
-MAX_SPEED = 500
+# ---------- STATES ----------
+STATE_SELECT = 0
+STATE_SORT = 1
+state = STATE_SELECT
+
+# Slider settings
+N = 20
+MIN_N, MAX_N = 10, 50
+slider_x, slider_w = 200, 400
+slider_y = 250
+dragging = False
 
 running = True
 while running:
