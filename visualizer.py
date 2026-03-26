@@ -89,6 +89,11 @@ def slider_x_to_val(mx):
     return max(MIN_N, min(MAX_N, int(round(val))))
 while running:
     dt = clock.tick(60)
+    for e in pygame.event.get():
+    if e.type == pygame.QUIT:
+        running = False
+    if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+        running = False
     # --- SELECT SCREEN ---
     if state == STATE_SELECT:
         if e.type == pygame.MOUSEBUTTONDOWN:
@@ -127,29 +132,7 @@ while running:
                 if e.key == pygame.K_r:
                     state = STATE_SELECT
                     playing = False
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            running = False
-        if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-            running = False
-            if e.key == pygame.K_SPACE:
-                playing = not playing
-            if e.key == pygame.K_RIGHT and not playing:
-                if step_idx < len(steps) - 1:
-                    step_idx += 1
-            if e.key == pygame.K_LEFT and not playing:
-                if step_idx > 0:
-                    step_idx -= 1
-            if e.key == pygame.K_UP:
-                speed = max(MIN_SPEED, speed - 20)
-            if e.key == pygame.K_DOWN:
-                speed = min(MAX_SPEED, speed + 20)
-            if e.key == pygame.K_r:
-                random.shuffle(arr)
-                steps = get_steps(arr)
-                step_idx = 0
-                playing = False
-                timer = 0
+
 
     # Advance
     if playing and step_idx < len(steps) - 1:
