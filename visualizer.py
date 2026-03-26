@@ -10,7 +10,7 @@ def get_steps(arr):
     steps = []
     for line in result.stdout.strip().split("\n"):
         nums = list(map(int, line.split()))
-        steps.append((nums[0], nums[1:]))  # (highlight_index, array)
+        steps.append((nums[0], nums[1], nums[2:]))  # (highlight_index, swapped, array)
     return steps
 
 pygame.init()
