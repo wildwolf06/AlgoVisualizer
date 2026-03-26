@@ -23,6 +23,8 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Bubble Sort — C++ + Pygame")
 font = pygame.font.SysFont("Consolas", 16)
 num_font = pygame.font.SysFont("Consolas", 11)
+title_font = pygame.font.SysFont("Consolas", 22, bold=True)
+slider_font = pygame.font.SysFont("Consolas", 14)
 clock = pygame.time.Clock()
 
 # Init
