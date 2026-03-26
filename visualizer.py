@@ -39,6 +39,24 @@ slider_x, slider_w = 200, 400
 slider_y = 250
 dragging = False
 
+# Sort state
+arr = []
+steps = []
+step_idx = 0
+playing = False
+timer = 0
+speed = 100
+MIN_SPEED = 20
+MAX_SPEED = 500
+
+# Animation state
+animating = False
+anim_timer = 0
+ANIM_DURATION = 150  
+anim_hi = -1          
+anim_prev_arr = []   
+prev_step_idx = -1    
+
 running = True
 while running:
     dt = clock.tick(60)
