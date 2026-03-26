@@ -69,6 +69,18 @@ def reset_sort():
     animating = False
     anim_timer = 0
     prev_step_idx = -1
+def start_swap_anim(new_idx):
+    """Trigger animation if the new step has a swap."""
+    global animating, anim_timer, anim_hi, anim_prev_arr
+    hi, swapped, cur = steps[new_idx]
+    if swapped and new_idx > 0:
+        animating = True
+        anim_timer = 0
+        anim_hi = hi
+        # previous step's array = the state before this swap
+        anim_prev_arr = steps[new_idx - 1][2]
+    else:
+        animating = False
 while running:
     dt = clock.tick(60)
     for e in pygame.event.get():
