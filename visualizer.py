@@ -81,14 +81,38 @@ def start_swap_anim(new_idx):
         anim_prev_arr = steps[new_idx - 1][2]
     else:
         animating = False
+def slider_val_to_x(val):
+    return slider_x + int((val - MIN_N) / (MAX_N - MIN_N) * slider_w)
+
+def slider_x_to_val(mx):
+    val = MIN_N + (mx - slider_x) / slider_w * (MAX_N - MIN_N)
+    return max(MIN_N, min(MAX_N, int(round(val))))
 while running:
     dt = clock.tick(60)
+    # --- SELECT SCREEN ---
+    if state == STATE_SELECT:
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            mx, my = e.pos
+            knob_x = slider_val_to_x(N)
+            if abs(mx - knob_x) < 15 and abs(my - slider_y) < 15:
+                dragging = True
+            # Start button
+            bx, by, bw, bh = 325, 320, 150, 40
+            if bx <= mx <= bx + bw and by <= my <= by + bh:
+                reset_sort()
+                state = STATE_SORT
+        if e.type == pygame.MOUSEBUTTONUP:
+            dragging = False
+        if e.type == pygame.MOUSEMOTION and dragging:
+            N = slider_x_to_val(e.pos[0])
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_RETURN:
+            reset_sort()
+            state = STATE_SORT
     for e in pygame.event.get():
         if e.type == pygame.QUIT:
             running = False
-        if e.type == pygame.KEYDOWN:
-            if e.key == pygame.K_ESCAPE:
-                running = False
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+            running = False
             if e.key == pygame.K_SPACE:
                 playing = not playing
             if e.key == pygame.K_RIGHT and not playing:
