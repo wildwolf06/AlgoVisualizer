@@ -13,6 +13,11 @@ def get_steps(arr):
         steps.append((nums[0], nums[1], nums[2:]))  # (highlight_index, swapped, array)
     return steps
 
+def count_swaps(steps, idx):
+    total = 0
+    for i in range(idx + 1):
+        total += steps[i][1]
+    return total
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Bubble Sort — C++ + Pygame")
