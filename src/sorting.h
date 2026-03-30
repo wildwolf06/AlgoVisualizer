@@ -48,4 +48,15 @@ inline vector<Step> bubbleSort(vector<int> arr) {
     return steps;
 }
 
+inline int countSwaps(const vector<Step>& steps, int upTo) {
+    int count = 0;
+    for (int i = 0; i <= upTo; i++) {
+        if (steps[i].swapped) count++;
+    }
+    return count;
+}
+
+
+
+
 #endif 
