@@ -22,5 +22,22 @@ int main(){
 
     // Create the Main Application Object
     App app;
+    while (!WindowShouldClose()) {
+        int w = GetScreenWidth();
+        int h = GetScreenHeight();
+
+        // 1. Process Input & Logic
+        app.update(w, h);
+
+        // 2. Render Graphics
+        BeginDrawing();
+        app.draw(w, h);
+        EndDrawing();
+    }
+
+    // ── Cleanup ──
+    if (gFont.texture.id != 0) UnloadFont(gFont);
+    CloseWindow();
+    return 0;
     
 }
