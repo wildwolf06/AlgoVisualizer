@@ -10,11 +10,11 @@ using namespace std;
 struct Step {
     vector<int> arr;
     int compared;
+    int compared_sec = -1;
     bool swapped;
 };
 
 // ── CORE ALGORITHM (Bubble Sort) ──
-// Returns a list of all steps taken during the sort.
 inline vector<Step> bubbleSort(vector<int> arr) {
     vector<Step> steps;
     int n = arr.size();
@@ -39,6 +39,43 @@ inline vector<Step> bubbleSort(vector<int> arr) {
     }
     
     // Final state (meaning done)
+    Step done;
+    done.arr      = arr;
+    done.compared = -1;
+    done.swapped  = false;
+    steps.push_back(done);
+
+    return steps;
+}
+//  (Insertion Sort) 
+inline vector<Step> insertionSort(vector<int> arr) {
+    vector<Step> steps;
+    int n = arr.size();
+
+    for (int i = 1; i < n; i++) {
+        int j = i;
+        while (j > 0) {
+            // Compare arr[j-1] and arr[j]
+            Step s;
+            s.arr = arr;
+            s.compared = j - 1;
+            s.swapped = false;
+            steps.push_back(s);
+
+            if (arr[j - 1] > arr[j]) {
+                swap(arr[j - 1], arr[j]);
+                Step sSwap;
+                sSwap.arr = arr;
+                sSwap.compared = j - 1;
+                sSwap.swapped = true;
+                steps.push_back(sSwap);
+                j--;
+            } else {
+                break; // No need to compare further, it's sorted
+            }
+        }
+    }
+    
     Step done;
     done.arr      = arr;
     done.compared = -1;
