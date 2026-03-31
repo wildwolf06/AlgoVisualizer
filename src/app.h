@@ -75,3 +75,16 @@ public:
     }
 
 };
+
+
+
+
+if (IsKeyPressed(KEY_ENTER)) {
+                if (customMode) {
+                    vector<int> arr;
+                    if (parseCustom(inputText, arr)) startSort(arr);
+                    else errorMsg = "Enter 2 to 50 numbers (1-999) separated by commas.";
+                } else {
+                    startSort(makeRandomArray(sliderValue));
+                }
+            }
