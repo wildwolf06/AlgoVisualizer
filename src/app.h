@@ -78,13 +78,16 @@ public:
 
 
 
+void update(int screenW, int screenH) {
+        float dt = GetFrameTime();
+        Vector2 mPos = GetMousePosition();
 
-if (IsKeyPressed(KEY_ENTER)) {
-                if (customMode) {
-                    vector<int> arr;
-                    if (parseCustom(inputText, arr)) startSort(arr);
-                    else errorMsg = "Enter 2 to 50 numbers (1-999) separated by commas.";
-                } else {
-                    startSort(makeRandomArray(sliderValue));
-                }
-            }
+        if (screen == 0) {
+            // ── SELECT SCREEN INPUT ──
+            int cx = screenW / 2;
+            int sliderX = cx - 200;
+            int sliderY = 300;
+            int sliderW = 400;
+
+            
+    }
