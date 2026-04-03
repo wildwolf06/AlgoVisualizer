@@ -1,6 +1,6 @@
 # Algorithm Visualizer
 
-A modular, cross-platform C++ application that visually demonstrates sorting algorithms using vibrant, animated bars and an interactive interface. Built primarily for educational purposes and project demonstrations (e.g., 1st-year viva presentations).
+A modular, cross-platform C++ application that visually demonstrates sorting algorithms using vibrant, animated bars and an interactive interface. 
 
 ![C++](https://img.shields.io/badge/C++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white)
 ![Raylib](https://img.shields.io/badge/Raylib-000000?style=for-the-badge&logo=raylib&logoColor=white)
