@@ -378,6 +378,7 @@ void update(int screenW, int screenH) {
             DrawTextSmoothCentered(hint.c_str(), 0, screenH - 45, screenW, 24, ACCENT_COLOR);
         }
     }
+
 };    
-    }
+    
 #endif
