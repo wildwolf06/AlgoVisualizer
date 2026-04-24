@@ -12,19 +12,43 @@ const int MIN_ARRAY_SIZE = 2;
 const int MAX_ARRAY_SIZE = 50;
 const int DEFAULT_ARRAY_SIZE = 20;
 
+// ── ABSTRACT CATEGORY COLORS ──
+const Color COLOR_SORTING   = { 0,   180, 255, 255 }; 
+const Color COLOR_SEARCHING = { 0,   220, 130, 255 }; 
+const Color COLOR_GRAPHS    = { 180,  80, 255, 255 }; 
 
-const Color BG_COLOR      = { 10,  10,  15, 255 };  // Almost black to make neon pop
-const Color PANEL_COLOR   = { 20,  22,  32, 255 };  // Sleek dark panel
-const Color BORDER_COLOR  = { 45,  50,  70, 255 };  // Soft border
+// ── UI OVERHAUL PALETTE ──
+const Color BG_COLOR      = { 255, 255, 255, 255 }; 
+const Color PANEL_COLOR   = { 15,  15,  15,  255 }; 
+const Color HOVER_COLOR   = { 30,  30,  30,  255 }; 
+const Color BORDER_COLOR  = { 45,  45,  52,  255 }; 
 
-const Color TEXT_COLOR    = { 255, 255, 255, 255 }; // Pure crisp white
-const Color DIM_TEXT      = { 160, 200, 240, 255 }; // Bright cyan-tinted dim text
-const Color ACCENT_COLOR  = { 0,   200, 255, 255 }; // Neon cyan
+const Color TEXT_COLOR    = { 0,   0,   0,   255 }; 
+const Color CARD_TEXT     = { 255, 255, 255, 255 }; 
+const Color DIM_TEXT      = { 120, 120, 130, 255 }; 
+const Color CARD_DIM_TEXT = { 150, 150, 150, 255 }; 
+const Color ACCENT_COLOR  = { 0,   160, 255, 255 }; 
+const Color ACCENT_HOVER  = { 40,  180, 255, 255 }; 
 
-// Bubble sort states 
-const Color BAR_NORMAL    = { 0,   180, 255, 255 }; // Neon Blue
-const Color BAR_COMPARING = { 255,  40,  90, 255 }; // Neon Red/Pink
-const Color BAR_SWAPPED   = { 255, 220,   0, 255 }; // Neon Yellow
-const Color BAR_DONE      = { 0,   255, 120, 255 }; // Neon Green
+// ── DASHBOARD SOFT PALETTE (Visualizer Screens) ──
+const Color DASH_BG       = { 248, 246, 240, 255 }; 
+const Color DASH_PANEL    = { 255, 255, 255, 255 }; 
+const Color DASH_TEXT     = { 45,  50,  55,  255 }; 
+const Color DASH_ACCENT   = { 170, 210, 240, 255 }; 
+const Color DASH_BORDER   = { 220, 220, 225, 255 }; 
+const Color DASH_DIM      = { 160, 165, 170, 255 }; 
 
-#endif 
+// ── VISUALIZER BAR STATES ──
+const Color BAR_NORMAL    = { 170, 210, 240, 255 }; 
+const Color BAR_COMPARING = { 250, 210, 130, 255 }; 
+const Color BAR_SWAPPING  = { 80,  170, 255, 255 }; 
+const Color BAR_DONE      = { 130, 200, 220, 255 }; 
+
+// ── SEARCH VISUALIZER PALETTE ──
+const Color SEARCH_NORMAL   = { 210, 200, 240, 255 }; 
+const Color SEARCH_DIM      = { 230, 230, 235, 255 }; 
+const Color SEARCH_BOUNDS   = { 140, 100, 200, 255 }; 
+const Color SEARCH_MID      = { 255, 200, 150, 255 }; 
+const Color SEARCH_FOUND    = { 160, 230, 180, 255 }; 
+
+#endif // CONSTANTS_H
