@@ -36,4 +36,13 @@ inline void DrawRoundedRectLines(int x, int y, int w, int h, float roundness, fl
     DrawRectangleRoundedLines(rec, roundness, 8, color);
 }
 
+inline void DrawGlowRect(int x, int y, int w, int h, float roundness, Color color, int glowRadius) {
+    for (int i = 1; i <= glowRadius; i += 2) {
+        Color c = color;
+        c.a = (unsigned char)(255 * 0.05f * (1.0f - (float)i / glowRadius)); 
+        Rectangle rec = {(float)x - i, (float)y - i, (float)w + i * 2, (float)h + i * 2};
+        DrawRectangleRounded(rec, roundness, 8, c);
+    }
+}
+
 #endif // UI_H
