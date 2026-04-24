@@ -233,3 +233,260 @@ void startSort(vector<int> arr) {
             }
         }
     }
+void update(int screenW, int screenH) {
+        float dt = GetFrameTime();
+        Vector2 mPos = GetMousePosition();
+
+        if (screen == 0) {
+            // ── SELECT SCREEN INPUT ──
+            int cx = screenW / 2;
+
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                int catY = 180, catW = 260, catH = 340, catGap = 40;
+                int catStartX = cx - ((catW * 3 + catGap * 2) / 2);
+                for (int i=0; i<3; i++) {
+                    int cx_cat = catStartX + i * (catW + catGap);
+                    if (mPos.y > catY && mPos.y < catY + catH && mPos.x > cx_cat && mPos.x < cx_cat + catW) {
+                        category = i; 
+                        algo = 0; 
+                        sliderValue = (i == 2) ? 4 : 20;
+                        customMode = false;
+                        
+                        // Immediately launch the dashboard
+                        if (category == 0) startSort(makeRandomArray(sliderValue));
+                        else if (category == 1) {
+                            vector<int> arr = makeRandomArray(sliderValue);
+                            startSearch(arr, arr[rand() % arr.size()]);
+                        }
+                        else if (category == 2) startGraphDFS_BFS(sliderValue);
+                    }
+                }
+            }
+        } else {
+            // VISUALIZATION SCREENS INPUT 
+            int totalSteps = 0;
+            if (screen == 1) totalSteps = steps.size();
+            else if (screen == 2) totalSteps = searchSteps.size();
+            else if (screen == 3) totalSteps = graphSteps.size();
+            
+            int oldStep = currentStep;
+
+            // Keyboard input
+            if (IsKeyPressed(KEY_SPACE)) playing = !playing;
+            if (IsKeyPressed(KEY_RIGHT) && !playing && currentStep < totalSteps - 1) currentStep++;
+            if (IsKeyPressed(KEY_LEFT) && !playing && currentStep > 0) currentStep--;
+            if (IsKeyPressed(KEY_UP)) { speed -= 20; if (speed < 20) speed = 20; }
+            if (IsKeyPressed(KEY_DOWN)) { speed += 20; if (speed > 1000) speed = 1000; }
+            if (IsKeyPressed(KEY_R)) { screen = 0; playing = false; } 
+
+            // Mouse Input for Dashboard
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                if (screen != 1) {
+                    if (mPos.x > 10 && mPos.x < 110 && mPos.y > 10 && mPos.y < 50) {
+                        screen = 0; playing = false;
+                    }
+                    int numAlgos = (category == 0) ? 3 : (category == 1 ? 1 : 2);
+                    int startX = 130;
+                    for (int i=0; i<numAlgos; i++) {
+                        int ax = startX + i * 130;
+                        if (mPos.x > ax && mPos.x < ax + 120 && mPos.y > 10 && mPos.y < 50) {
+                            if (algo != i) {
+                                algo = i;
+                                if (category == 0) {}
+                                else if (category == 1) { vector<int> arr = makeRandomArray(sliderValue); startSearch(arr, arr[rand() % arr.size()]); }
+                                else if (category == 2) startGraphDFS_BFS(sliderValue);
+                            }
+                        }
+                    }
+                    int rightX = screenW - 10;
+                    if (mPos.x > rightX - 50 && mPos.x < rightX - 10 && mPos.y > 10 && mPos.y < 50) playing = !playing;
+                    rightX -= 140; // Past play and random
+                    if (mPos.x > rightX && mPos.x < rightX + 80 && mPos.y > 10 && mPos.y < 50) { // Random
+                        if (category == 0) {}
+                        else if (category == 1) { vector<int> arr = makeRandomArray(sliderValue); startSearch(arr, arr[rand() % arr.size()]); }
+                        else if (category == 2) startGraphDFS_BFS(sliderValue);
+                    }
+                    rightX -= 90; // Custom (stub)
+                    rightX -= 140; // Speed Slider center
+                    if (mPos.x > rightX && mPos.x < rightX + 120 && mPos.y > 20 && mPos.y < 50) isDraggingSpeed = true;
+                    rightX -= 140; // Size Slider center
+                    if (mPos.x > rightX && mPos.x < rightX + 120 && mPos.y > 20 && mPos.y < 50) isDraggingSize = true;
+                }
+            }
+            
+            if (IsMouseButtonUp(MOUSE_LEFT_BUTTON)) {
+                isDraggingSpeed = false;
+                isDraggingSize = false;
+            }
+            
+            if (isDraggingSpeed) {
+                if (screen == 1) {
+                    float pct = (mPos.x - 30) / 200.0f;
+                    if (pct < 0) pct = 0; if (pct > 1) pct = 1;
+                    speed = 1000 - (int)(pct * 980);
+                    if (speed < 20) speed = 20;
+                } else {
+                    int rightX = screenW - 10 - 50 - 90 - 90 - 140; 
+                    float pct = (mPos.x - rightX) / 120.0f;
+                    if (pct < 0) pct = 0; if (pct > 1) pct = 1;
+                    speed = 1000 - (int)(pct * 980);
+                    if (speed < 20) speed = 20;
+                }
+            }
+            if (isDraggingSize) {
+                int rightX = screenW - 10 - 50 - 90 - 90 - 140 - 140;
+                float pct = (mPos.x - rightX) / 120.0f;
+                if (pct < 0) pct = 0; if (pct > 1) pct = 1;
+                int minV = MIN_ARRAY_SIZE, maxV = MAX_ARRAY_SIZE;
+                if (category == 2) { minV = 2; maxV = 7; }
+                sliderValue = minV + (int)(pct * (maxV - minV) + 0.5f);
+            }
+
+            // Screen 1 & 2 Left Panel Input & Typing
+            if (screen == 1 || screen == 2) {
+                if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                    // Focus inputs
+                    if (mPos.x > 30 && mPos.x < 230 && mPos.y > 135 && mPos.y < 165) active_input_field = 1; // N
+                    else if (mPos.x > 30 && mPos.x < 230 && mPos.y > 255 && mPos.y < 285) active_input_field = 2; // Manual
+                    else if (screen == 2 && mPos.x > 30 && mPos.x < 230 && mPos.y > 400 && mPos.y < 430) active_input_field = 3; // Target
+                    else active_input_field = 0;
+                    
+                    // Distribution toggle
+                    if (mPos.x > 30 && mPos.x < 230 && mPos.y > 195 && mPos.y < 225) {
+                        current_distribution = (DistributionType)((current_distribution + 1) % 4);
+                    }
+                    
+                    // CREATE button
+                    if (mPos.x > 30 && mPos.x < 230 && mPos.y > 300 && mPos.y < 340) {
+                        vector<int> newArr;
+                        if (!manual_array_buffer.empty()) {
+                            newArr = parseManualInput(manual_array_buffer);
+                        }
+                        if (newArr.empty()) {
+                            int N = 20;
+                            try { N = stoi(num_elements_buffer); } catch(...) {}
+                            if (N < 2) N = 2; if (N > 200) N = 200;
+                            if (current_distribution == RANDOM_DIST) newArr = makeRandomArray(N);
+                            else if (current_distribution == SORTED_NON_DECREASING) newArr = makeSortedArray(N, true);
+                            else if (current_distribution == SORTED_NON_INCREASING) newArr = makeSortedArray(N, false);
+                            else if (current_distribution == MANY_DUPLICATES) newArr = makeDuplicatesArray(N);
+                        }
+                        
+                        if (screen == 2) {
+                            sort(newArr.begin(), newArr.end()); // Enforce sorted array for binary search
+                        }
+                        
+                        originalArr = newArr;
+                        if (screen == 1) {
+                            steps.clear();
+                            currentStep = 0;
+                            playing = false;
+                        } else {
+                            searchSteps.clear();
+                            currentStep = 0;
+                            playing = false;
+                        }
+                        timer = 0;
+                        theoretical_complexity_str = "";
+                        memset(realtime_status_msg, 0, sizeof(realtime_status_msg));
+                    }
+                    
+                    if (screen == 1) {
+                        // Algorithm toggle (Left Panel)
+                        if (mPos.x > 30 && mPos.x < 230 && mPos.y > 380 && mPos.y < 410) {
+                            algo = (algo + 1) % 3;
+                        }
+                        
+                        // Order toggle (Left Panel)
+                        if (mPos.x > 30 && mPos.x < 230 && mPos.y > 420 && mPos.y < 450) {
+                            sort_ascending = !sort_ascending;
+                        }
+                        
+                        // SORT button
+                        if (mPos.x > 30 && mPos.x < 230 && mPos.y > 460 && mPos.y < 520) {
+                            if (!originalArr.empty()) {
+                                startSort(originalArr);
+                            }
+                        }
+                    } else if (screen == 2) {
+                        // SEARCH button
+                        if (mPos.x > 30 && mPos.x < 230 && mPos.y > 460 && mPos.y < 520) {
+                            if (!originalArr.empty() && !target_buffer.empty()) {
+                                int t = 0;
+                                try { t = stoi(target_buffer); } catch(...) {}
+                                startSearch(originalArr, t);
+                            }
+                        }
+                    }
+                    
+                    // Speed Slider (Left Panel)
+                    if (mPos.x > 30 && mPos.x < 230 && mPos.y > 560 && mPos.y < 610) {
+                        isDraggingSpeed = true;
+                    }
+                    
+                    // Bottom Playback Controls (Prev, Play, Next)
+                    int pbY = screenH - 60;
+                    int pbCX = screenW / 2;
+                    // Prev: cx - 150, width 80
+                    if (mPos.x > pbCX - 150 && mPos.x < pbCX - 70 && mPos.y > pbY && mPos.y < pbY + 40) {
+                        if (screen == 1 && !steps.empty() && currentStep > 0) { currentStep--; playing = false; }
+                        else if (screen == 2 && !searchSteps.empty() && currentStep > 0) { currentStep--; playing = false; }
+                    }
+                    // Play/Pause: cx - 60, width 120
+                    if (mPos.x > pbCX - 60 && mPos.x < pbCX + 60 && mPos.y > pbY && mPos.y < pbY + 40) {
+                        if (screen == 1 && !steps.empty()) {
+                            if (currentStep >= totalSteps - 1) { currentStep = 0; playing = true; } else { playing = !playing; }
+                        } else if (screen == 2 && !searchSteps.empty()) {
+                            if (currentStep >= totalSteps - 1) { currentStep = 0; playing = true; } else { playing = !playing; }
+                        }
+                    }
+                    // Next: cx + 70, width 80
+                    if (mPos.x > pbCX + 70 && mPos.x < pbCX + 150 && mPos.y > pbY && mPos.y < pbY + 40) {
+                        if (screen == 1 && !steps.empty() && currentStep < totalSteps - 1) { currentStep++; playing = false; }
+                        else if (screen == 2 && !searchSteps.empty() && currentStep < totalSteps - 1) { currentStep++; playing = false; }
+                    }
+                    
+                    // Top Left Menu Button
+                    if (mPos.x > 10 && mPos.x < 110 && mPos.y > 10 && mPos.y < 50) {
+                        screen = 0; playing = false;
+                    }
+                }
+                
+                // Typing
+                if (active_input_field > 0) {
+                    int key = GetCharPressed();
+                    while (key > 0) {
+                        if ((key >= 32) && (key <= 125)) {
+                            if (active_input_field == 1 && num_elements_buffer.length() < 9 && key >= '0' && key <= '9') {
+                                num_elements_buffer += (char)key;
+                            } else if (active_input_field == 2 && manual_array_buffer.length() < 250) {
+                                manual_array_buffer += (char)key;
+                            } else if (active_input_field == 3 && target_buffer.length() < 9 && (key == '-' || (key >= '0' && key <= '9'))) {
+                                target_buffer += (char)key;
+                            }
+                        }
+                        key = GetCharPressed();
+                    }
+                    if (IsKeyPressed(KEY_BACKSPACE)) {
+                        if (active_input_field == 1 && !num_elements_buffer.empty()) num_elements_buffer.pop_back();
+                        if (active_input_field == 2 && !manual_array_buffer.empty()) manual_array_buffer.pop_back();
+                        if (active_input_field == 3 && !target_buffer.empty()) target_buffer.pop_back();
+                    }
+                }
+            }
+
+            // Auto-play
+            if (playing && currentStep < totalSteps - 1) {
+                timer += (int)(dt * 1000);
+                if (timer >= speed) {
+                    currentStep++; 
+                    timer = 0; 
+                }
+            }
+            
+            if (currentStep != oldStep) {
+                if (screen == 1) updateStatusMessage();
+                else if (screen == 2) updateSearchStatusMessage();
+            }
+        }
+    }
