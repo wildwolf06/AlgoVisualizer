@@ -71,3 +71,58 @@ inline vector<GraphNode> generateGraph(int maxDepth) {
     layoutGraph(nodes, 0, maxDepth);
     return nodes;
 }
+inline vector<GraphStep> dfs(const vector<GraphNode>& nodes, int rootId) {
+    vector<GraphStep> steps;
+    if (nodes.empty() || rootId == -1) return steps;
+    vector<int> visited, stack;
+
+    struct DFSWorker {
+        const vector<GraphNode>& tNodes; vector<GraphStep>& tSteps;
+        vector<int>& tVisited; vector<int>& tStack;
+        void run(int nodeIdx) {
+            if (nodeIdx == -1) return;
+            tStack.push_back(nodeIdx);
+            
+            GraphStep step1 = {nodeIdx, tVisited, tStack, false};
+            tSteps.push_back(step1);
+
+            run(tNodes[nodeIdx].leftId);
+            run(tNodes[nodeIdx].rightId);
+
+            tStack.pop_back();
+            tVisited.push_back(nodeIdx);
+
+            GraphStep step2 = {tStack.empty() ? -1 : tStack.back(), tVisited, tStack, tStack.empty()};
+            tSteps.push_back(step2);
+        }
+    };
+    DFSWorker worker = {nodes, steps, visited, stack};
+    worker.run(rootId);
+    return steps;
+}
+inline vector<GraphStep> bfs(const vector<GraphNode>& nodes, int rootId) {
+    vector<GraphStep> steps;
+    if (nodes.empty() || rootId == -1) return steps;
+    vector<int> visited, activeQueue; queue<int> q;
+
+    q.push(rootId); activeQueue.push_back(rootId);
+
+    while (!q.empty()) {
+        int curr = q.front(); q.pop();
+        auto it = find(activeQueue.begin(), activeQueue.end(), curr);
+        if (it != activeQueue.end()) activeQueue.erase(it);
+        
+        GraphStep visitStep = {curr, visited, activeQueue, false};
+        steps.push_back(visitStep);
+
+        if (nodes[curr].leftId != -1) { q.push(nodes[curr].leftId); activeQueue.push_back(nodes[curr].leftId); }
+        if (nodes[curr].rightId != -1) { q.push(nodes[curr].rightId); activeQueue.push_back(nodes[curr].rightId); }
+
+        visited.push_back(curr);
+        GraphStep expandStep = {curr, visited, activeQueue, q.empty()};
+        steps.push_back(expandStep);
+    }
+    return steps;
+}
+
+#endif // GRAPH_H
