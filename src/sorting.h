@@ -9,99 +9,68 @@ using namespace std;
 // ── SNAPSHOT OF THE ARRAY ──
 struct Step {
     vector<int> arr;
+    vector<int> indices;
     int compared;
     int compared_sec = -1;
     bool swapped;
+    bool isComparison = false;
+    bool sortAscending = true;
 };
 
 // ── CORE ALGORITHM (Bubble Sort) ──
-inline vector<Step> bubbleSort(vector<int> arr) {
+inline vector<Step> bubbleSort(vector<int> arr, bool sortAscending = true) {
     vector<Step> steps;
     int n = arr.size();
+    vector<int> idx(n);
+    for (int i = 0; i < n; i++) idx[i] = i;
 
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - 1 - i; j++) {
             bool didSwap = false;
-            
-            // Compare and swap
-            if (arr[j] > arr[j + 1]) {
+            bool condition = sortAscending ? (arr[j] > arr[j + 1]) : (arr[j] < arr[j + 1]);
+            if (condition) {
                 swap(arr[j], arr[j + 1]);
+                swap(idx[j], idx[j + 1]);
                 didSwap = true;
             }
-
-            // Save the state after this comparison/swap
             Step s;
-            s.arr      = arr;
-            s.compared = j;
-            s.swapped  = didSwap;
+            s.arr = arr; s.indices = idx; s.compared = j; s.swapped = didSwap;
+            s.isComparison = true; s.sortAscending = sortAscending;
             steps.push_back(s);
         }
     }
-    
-    // Final state (meaning done)
-    Step done;
-    done.arr      = arr;
-    done.compared = -1;
-    done.swapped  = false;
-    steps.push_back(done);
-
+    Step done; done.arr = arr; done.indices = idx; done.compared = -1;
+    done.swapped = false; done.sortAscending = sortAscending; steps.push_back(done);
     return steps;
 }
-//  (Insertion Sort) 
-inline vector<Step> insertionSort(vector<int> arr) {
+
+// ── CORE ALGORITHM (Insertion Sort) ──
+inline vector<Step> insertionSort(vector<int> arr, bool sortAscending = true) {
     vector<Step> steps;
     int n = arr.size();
+    vector<int> idx(n);
+    for (int i = 0; i < n; i++) idx[i] = i;
 
     for (int i = 1; i < n; i++) {
         int j = i;
         while (j > 0) {
-            // Compare arr[j-1] and arr[j]
-            Step s;
-            s.arr = arr;
-            s.compared = j - 1;
-            s.swapped = false;
-            steps.push_back(s);
+            Step s; s.arr = arr; s.indices = idx; s.compared = j - 1; s.swapped = false;
+            s.isComparison = true; s.sortAscending = sortAscending; steps.push_back(s);
 
-            if (arr[j - 1] > arr[j]) {
+            bool condition = sortAscending ? (arr[j - 1] > arr[j]) : (arr[j - 1] < arr[j]);
+            if (condition) {
                 swap(arr[j - 1], arr[j]);
-                Step sSwap;
-                sSwap.arr = arr;
-                sSwap.compared = j - 1;
-                sSwap.swapped = true;
+                swap(idx[j - 1], idx[j]);
+                Step sSwap; sSwap.arr = arr; sSwap.indices = idx; sSwap.compared = j - 1;
+                sSwap.swapped = true; sSwap.isComparison = false; sSwap.sortAscending = sortAscending;
                 steps.push_back(sSwap);
                 j--;
-            } else {
-                break; // No need to compare further, it's sorted
-            }
+            } else break; 
         }
     }
-    
-    Step done;
-    done.arr      = arr;
-    done.compared = -1;
-    done.swapped  = false;
-    steps.push_back(done);
-
+    Step done; done.arr = arr; done.indices = idx; done.compared = -1;
+    done.swapped = false; done.sortAscending = sortAscending; steps.push_back(done);
     return steps;
 }
 
-inline int countSwaps(const vector<Step>& steps, int upTo) {
-    int count = 0;
-    for (int i = 0; i <= upTo; i++) {
-        if (steps[i].swapped) count++;
-    }
-    return count;
-}
-
-inline vector<int> makeRandomArray(int n) {
-    vector<int> arr(n);
-    for (int i = 0; i < n; i++) arr[i] = i + 1;
-    for (int i = n - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        swap(arr[i], arr[j]);
-    }
-    return arr;
-}
-
-
-#endif 
+#endif // SORTING_H
