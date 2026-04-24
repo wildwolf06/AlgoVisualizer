@@ -490,3 +490,101 @@ void update(int screenW, int screenH) {
             }
         }
     }
+void startExecution() {
+        if (category == 0) {
+            if (customMode) {
+                vector<int> arr;
+                if (parseCustom(inputText, arr)) startSort(arr);
+                else errorMsg = "Enter 2 to 50 numbers (1-999) separated by commas.";
+            } else {
+                startSort(makeRandomArray(sliderValue));
+            }
+        } else if (category == 1) {
+            int target = -1;
+            if (!searchTargetText.empty()) {
+                target = stoi(searchTargetText);
+            }
+            if (customMode) {
+                vector<int> arr;
+                if (parseCustom(inputText, arr)) {
+                    if (target == -1) target = arr[rand() % arr.size()];
+                    startSearch(arr, target);
+                }
+                else errorMsg = "Enter 2 to 50 numbers (1-999) separated by commas.";
+            } else {
+                vector<int> arr = makeRandomArray(sliderValue);
+                if (target == -1) target = arr[rand() % arr.size()];
+                startSearch(arr, target);
+            }
+        } else if (category == 2) {
+            startGraphDFS_BFS(sliderValue);
+        }
+    }
+
+    void drawDashboardTopBar(int screenW, Vector2 mPos) {
+        DrawRectangle(0, 0, screenW, 60, DASH_PANEL);
+        DrawRectangle(0, 60, screenW, 1, DASH_BORDER);
+        
+        bool backHover = (mPos.x > 10 && mPos.x < 110 && mPos.y > 10 && mPos.y < 50);
+        DrawRoundedRectLines(10, 10, 100, 40, 0.2f, 1.0f, backHover ? DASH_ACCENT : DASH_BORDER);
+        DrawTextSmoothCentered("< MENU", 10, 20, 100, 20, backHover ? DASH_ACCENT : DASH_TEXT);
+        
+        int numAlgos = (category == 0) ? 3 : (category == 1 ? 1 : 2);
+        string sortNames[] = {"Bubble", "Insertion", "Selection"};
+        string searchNames[] = {"Binary Search", ""};
+        string graphNames[] = {"DFS", "BFS"};
+        string* names = (category == 0) ? sortNames : (category == 1 ? searchNames : graphNames);
+        
+        int startX = 130; 
+        for (int i=0; i<numAlgos; i++) {
+            int ax = startX + i * 130;
+            bool hover = (mPos.x > ax && mPos.x < ax + 120 && mPos.y > 10 && mPos.y < 50);
+            bool active = (algo == i);
+            Color bg = active ? DASH_ACCENT : (hover ? DASH_BG : DASH_PANEL);
+            Color textCol = active ? DASH_PANEL : DASH_TEXT;
+            DrawRoundedRect(ax, 10, 120, 40, 0.2f, bg);
+            if (!active) DrawRoundedRectLines(ax, 10, 120, 40, 0.2f, 1.0f, hover ? DASH_ACCENT : DASH_BORDER);
+            DrawTextSmoothCentered(names[i].c_str(), ax, 20, 120, 18, textCol);
+        }
+        
+        int rightX = screenW - 10;
+        
+        rightX -= 50;
+        bool playHover = (mPos.x > rightX && mPos.x < rightX + 40 && mPos.y > 10 && mPos.y < 50);
+        DrawRoundedRect(rightX, 10, 40, 40, 0.2f, playHover ? DASH_BG : DASH_PANEL);
+        DrawRoundedRectLines(rightX, 10, 40, 40, 0.2f, 1.0f, DASH_BORDER);
+        if (playing) {
+            DrawRectangle(rightX + 13, 22, 5, 16, DASH_ACCENT);
+            DrawRectangle(rightX + 22, 22, 5, 16, DASH_ACCENT);
+        } else {
+            DrawTriangle({(float)rightX + 15, 20}, {(float)rightX + 15, 40}, {(float)rightX + 30, 30}, DASH_ACCENT);
+        }
+        
+        rightX -= 90;
+        bool rndHover = (mPos.x > rightX && mPos.x < rightX + 80 && mPos.y > 10 && mPos.y < 50);
+        DrawRoundedRect(rightX, 10, 80, 40, 0.2f, rndHover ? DASH_BG : DASH_PANEL);
+        DrawRoundedRectLines(rightX, 10, 80, 40, 0.2f, 1.0f, DASH_BORDER);
+        DrawTextSmoothCentered("RANDOM", rightX, 22, 80, 16, DASH_TEXT);
+        
+        rightX -= 90;
+        bool cstHover = (mPos.x > rightX && mPos.x < rightX + 80 && mPos.y > 10 && mPos.y < 50);
+        DrawRoundedRect(rightX, 10, 80, 40, 0.2f, cstHover ? DASH_BG : DASH_PANEL);
+        DrawRoundedRectLines(rightX, 10, 80, 40, 0.2f, 1.0f, DASH_BORDER);
+        DrawTextSmoothCentered("CUSTOM", rightX, 22, 80, 16, DASH_DIM);
+        
+        rightX -= 140;
+        DrawTextSmoothCentered("SPEED", rightX, 12, 120, 14, DASH_DIM);
+        DrawRoundedRect(rightX, 35, 120, 4, 1.0f, DASH_BORDER);
+        float speedPct = 1.0f - ((float)(speed - 20) / 980.0f);
+        DrawRoundedRect(rightX, 35, (int)(speedPct * 120), 4, 1.0f, DASH_ACCENT);
+        DrawCircle(rightX + (int)(speedPct * 120), 37, 8, DASH_ACCENT);
+        
+        rightX -= 140;
+        DrawTextSmoothCentered("SIZE", rightX, 12, 120, 14, DASH_DIM);
+        DrawRoundedRect(rightX, 35, 120, 4, 1.0f, DASH_BORDER);
+        int minV = MIN_ARRAY_SIZE, maxV = MAX_ARRAY_SIZE;
+        if (category == 2) { minV = 2; maxV = 7; }
+        float sizePct = (float)(sliderValue - minV) / (maxV - minV);
+        DrawRoundedRect(rightX, 35, (int)(sizePct * 120), 4, 1.0f, DASH_ACCENT);
+        DrawCircle(rightX + (int)(sizePct * 120), 37, 8, DASH_ACCENT);
+    }
