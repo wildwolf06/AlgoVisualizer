@@ -588,3 +588,415 @@ void startExecution() {
         DrawRoundedRect(rightX, 35, (int)(sizePct * 120), 4, 1.0f, DASH_ACCENT);
         DrawCircle(rightX + (int)(sizePct * 120), 37, 8, DASH_ACCENT);
     }
+void draw(int screenW, int screenH) {
+        ClearBackground(BG_COLOR);
+        int cx = screenW / 2;
+
+        if (screen == 0) {
+            Vector2 mPos = GetMousePosition();
+            
+            // Stylized Header
+            DrawTextSmoothCentered("ALGORITHM VISUALIZER", 0, 40, screenW, 56, TEXT_COLOR);
+            
+            // State A: Category Selection
+            int catY = 180, catW = 260, catH = 340, catGap = 40;
+            int catStartX = cx - ((catW * 3 + catGap * 2) / 2);
+            string names[] = {"SORTING", "SEARCHING", "GRAPHS"};
+            Color catColors[] = {COLOR_SORTING, COLOR_SEARCHING, COLOR_GRAPHS};
+            
+            for (int i=0; i<3; i++) {
+                int cx_cat = catStartX + i * (catW + catGap);
+                bool hover = (mPos.x > cx_cat && mPos.x < cx_cat + catW && mPos.y > catY && mPos.y < catY + catH);
+                Color baseColor = catColors[i];
+                Color bgColor = hover ? HOVER_COLOR : PANEL_COLOR;
+                
+                if (hover) {
+                    DrawGlowRect(cx_cat, catY, catW, catH, 0.1f, baseColor, 15);
+                }
+                
+                DrawRoundedRect(cx_cat, catY, catW, catH, 0.1f, bgColor);
+                DrawRoundedRectLines(cx_cat, catY, catW, catH, 0.1f, 3.0f, hover ? baseColor : BORDER_COLOR);
+                
+                // Simple Abstract Visual for Cards
+                int iconY = catY + 80;
+                if (i == 0) { // Sorting icon
+                    DrawRoundedRect(cx_cat + 50, iconY + 60, 30, 40, 0.0f, baseColor);
+                    DrawRoundedRect(cx_cat + 90, iconY + 20, 30, 80, 0.0f, baseColor);
+                    DrawRoundedRect(cx_cat + 130, iconY + 40, 30, 60, 0.0f, baseColor);
+                    DrawRoundedRect(cx_cat + 170, iconY, 30, 100, 0.0f, baseColor);
+                } else if (i == 1) { // Searching icon
+                    DrawCircle(cx_cat + 130, iconY + 50, 40, baseColor);
+                    DrawCircle(cx_cat + 130, iconY + 50, 30, bgColor); // inner hollow
+                    DrawLineEx({(float)cx_cat + 155, (float)iconY + 75}, {(float)cx_cat + 185, (float)iconY + 105}, 10.0f, baseColor);
+                } else if (i == 2) { // Graph icon
+                    DrawCircle(cx_cat + 130, iconY + 20, 15, baseColor);
+                    DrawCircle(cx_cat + 80, iconY + 80, 15, baseColor);
+                    DrawCircle(cx_cat + 180, iconY + 80, 15, baseColor);
+                    DrawLineEx({(float)cx_cat + 130, (float)iconY + 20}, {(float)cx_cat + 80, (float)iconY + 80}, 5.0f, baseColor);
+                    DrawLineEx({(float)cx_cat + 130, (float)iconY + 20}, {(float)cx_cat + 180, (float)iconY + 80}, 5.0f, baseColor);
+                    DrawLineEx({(float)cx_cat + 80, (float)iconY + 80}, {(float)cx_cat + 180, (float)iconY + 80}, 5.0f, baseColor);
+                }
+                
+                DrawTextSmoothCentered(names[i].c_str(), cx_cat, catY + catH - 60, catW, 32, CARD_TEXT);
+            }
+        } else if (screen == 1 || screen == 2) {
+            ClearBackground(DASH_BG);
+            Vector2 mPos = GetMousePosition();
+            
+            // Draw Left Panel (Full Height)
+            int leftPanelW = 260;
+            DrawRectangle(0, 0, leftPanelW, screenH, DASH_PANEL);
+            DrawLine(leftPanelW, 0, leftPanelW, screenH, DASH_BORDER);
+            
+            // Top Left Menu Button
+            bool menuHover = (mPos.x > 10 && mPos.x < 110 && mPos.y > 10 && mPos.y < 50);
+            DrawRoundedRectLines(10, 10, 100, 40, 0.2f, 1.0f, menuHover ? DASH_ACCENT : DASH_BORDER);
+            DrawTextSmoothCentered("< MENU", 10, 20, 100, 20, menuHover ? DASH_ACCENT : DASH_TEXT);
+            
+            // "CREATE" Section
+            DrawTextSmooth("CREATE", 30, 80, 24, DASH_TEXT);
+            
+            DrawTextSmooth("Size (N)", 30, 115, 16, DASH_DIM);
+            DrawRoundedRect(30, 135, 200, 30, 0.2f, active_input_field == 1 ? DASH_BG : DASH_PANEL);
+            DrawRoundedRectLines(30, 135, 200, 30, 0.2f, 1.0f, active_input_field == 1 ? DASH_ACCENT : DASH_BORDER);
+            DrawTextSmooth(num_elements_buffer.c_str(), 40, 142, 16, DASH_TEXT);
+            
+            DrawTextSmooth("Distribution", 30, 175, 16, DASH_DIM);
+            string distNames[] = {"Random", "Sorted (Asc)", "Sorted (Desc)", "Duplicates"};
+            DrawRoundedRect(30, 195, 200, 30, 0.2f, DASH_PANEL);
+            DrawRoundedRectLines(30, 195, 200, 30, 0.2f, 1.0f, DASH_BORDER);
+            DrawTextSmoothCentered(distNames[current_distribution].c_str(), 30, 202, 200, 16, DASH_TEXT);
+            DrawTriangle({215, 205}, {225, 205}, {220, 215}, DASH_DIM); 
+            
+            DrawTextSmooth("Manual Array", 30, 235, 16, DASH_DIM);
+            DrawRoundedRect(30, 255, 200, 30, 0.2f, active_input_field == 2 ? DASH_BG : DASH_PANEL);
+            DrawRoundedRectLines(30, 255, 200, 30, 0.2f, 1.0f, active_input_field == 2 ? DASH_ACCENT : DASH_BORDER);
+            DrawTextSmooth(manual_array_buffer.c_str(), 40, 262, 16, DASH_TEXT);
+            
+            bool createHover = (mPos.x > 30 && mPos.x < 230 && mPos.y > 300 && mPos.y < 340);
+            DrawRoundedRect(30, 300, 200, 40, 0.2f, createHover ? DASH_ACCENT : DASH_PANEL);
+            DrawRoundedRectLines(30, 300, 200, 40, 0.2f, 1.0f, DASH_BORDER);
+            DrawTextSmoothCentered("CREATE", 30, 312, 200, 18, createHover ? DASH_PANEL : DASH_ACCENT);
+            
+            // Actions Section
+            DrawLine(20, 350, leftPanelW - 20, 350, DASH_BORDER);
+            
+            if (screen == 1) {
+                // "SORT" Section
+                DrawTextSmooth("Algorithm", 30, 360, 16, DASH_DIM);
+                string algNames[] = {"Bubble Sort", "Insertion Sort", "Selection Sort"};
+                DrawRoundedRect(30, 380, 200, 30, 0.2f, DASH_PANEL);
+                DrawRoundedRectLines(30, 380, 200, 30, 0.2f, 1.0f, DASH_BORDER);
+                DrawTextSmoothCentered(algNames[algo].c_str(), 30, 386, 200, 16, DASH_TEXT);
+                DrawTriangle({215, 390}, {225, 390}, {220, 400}, DASH_DIM); 
+                
+                DrawTextSmooth("Order", 30, 400, 16, DASH_DIM);
+                DrawRoundedRect(30, 420, 200, 30, 0.2f, DASH_PANEL);
+                DrawRoundedRectLines(30, 420, 200, 30, 0.2f, 1.0f, DASH_BORDER);
+                DrawTextSmoothCentered(sort_ascending ? "Ascending" : "Descending", 30, 426, 200, 16, DASH_TEXT);
+                DrawTriangle({215, 430}, {225, 430}, {220, 440}, DASH_DIM); 
+                
+                bool sortHover = (mPos.x > 30 && mPos.x < 230 && mPos.y > 460 && mPos.y < 520);
+                DrawRoundedRect(30, 460, 200, 60, 0.2f, sortHover ? BAR_NORMAL : DASH_PANEL);
+                DrawRoundedRectLines(30, 460, 200, 60, 0.2f, 1.0f, DASH_BORDER);
+                DrawTextSmoothCentered("SORT", 30, 480, 200, 24, sortHover ? DASH_PANEL : BAR_NORMAL);
+            } else if (screen == 2) {
+                // "SEARCH" Section
+                DrawTextSmooth("Target Value", 30, 380, 16, DASH_DIM);
+                DrawRoundedRect(30, 400, 200, 30, 0.2f, active_input_field == 3 ? DASH_BG : DASH_PANEL);
+                DrawRoundedRectLines(30, 400, 200, 30, 0.2f, 1.0f, active_input_field == 3 ? DASH_ACCENT : DASH_BORDER);
+                DrawTextSmooth(target_buffer.c_str(), 40, 407, 16, DASH_TEXT);
+                
+                bool searchHover = (mPos.x > 30 && mPos.x < 230 && mPos.y > 460 && mPos.y < 520);
+                DrawRoundedRect(30, 460, 200, 60, 0.2f, searchHover ? BAR_NORMAL : DASH_PANEL);
+                DrawRoundedRectLines(30, 460, 200, 60, 0.2f, 1.0f, DASH_BORDER);
+                DrawTextSmoothCentered("SEARCH", 30, 480, 200, 24, searchHover ? DASH_PANEL : BAR_NORMAL);
+            }
+            
+            // Speed Slider
+            DrawLine(20, 540, leftPanelW - 20, 540, DASH_BORDER);
+            DrawTextSmooth("Animation Speed", 30, 550, 16, DASH_DIM);
+            float speedPct = (1000.0f - speed) / 980.0f; 
+            if (speedPct < 0.0f) speedPct = 0.0f; if (speedPct > 1.0f) speedPct = 1.0f;
+            DrawRoundedRect(30, 580, 200, 8, 0.5f, DASH_PANEL);
+            DrawRoundedRect(30, 580, (int)(200 * speedPct), 8, 0.5f, DASH_ACCENT);
+            DrawCircle(30 + (int)(200 * speedPct), 584, 8, DASH_TEXT);
+            
+            // Right Panel (Metrics) - Full Height
+            int rightPanelW = 200;
+            int rightPanelX = screenW - rightPanelW;
+            DrawRectangle(rightPanelX, 0, rightPanelW, screenH, DASH_PANEL);
+            DrawLine(rightPanelX, 0, rightPanelX, screenH, DASH_BORDER);
+            
+            int cCount = 0;
+            int sCount = 0;
+            if (screen == 1) {
+                cCount = steps.empty() ? 0 : countComparisons(steps, currentStep);
+                sCount = steps.empty() ? 0 : countSwaps(steps, currentStep);
+            } else if (screen == 2) {
+                cCount = searchSteps.empty() ? 0 : currentStep; 
+            }
+            
+            // Comparisons Box
+            DrawRoundedRect(rightPanelX + 20, 100, 160, 100, 0.1f, DASH_PANEL);
+            DrawRoundedRectLines(rightPanelX + 20, 100, 160, 100, 0.1f, 3.0f, BAR_COMPARING);
+            DrawTextSmoothCentered("Comparisons", rightPanelX + 20, 120, 160, 18, DASH_DIM);
+            DrawTextSmoothCentered(to_string(cCount).c_str(), rightPanelX + 20, 150, 160, 32, BAR_COMPARING);
+            
+            if (screen == 1) {
+                // Swaps Box
+                DrawRoundedRect(rightPanelX + 20, 220, 160, 100, 0.1f, DASH_PANEL);
+                DrawRoundedRectLines(rightPanelX + 20, 220, 160, 100, 0.1f, 3.0f, BAR_SWAPPING);
+                DrawTextSmoothCentered("Swaps", rightPanelX + 20, 240, 160, 18, DASH_DIM);
+                DrawTextSmoothCentered(to_string(sCount).c_str(), rightPanelX + 20, 270, 160, 32, BAR_SWAPPING);
+                
+                // Complexity Text
+                if (!theoretical_complexity_str.empty()) {
+                    DrawTextSmoothCentered("Complexity", rightPanelX + 20, 350, 160, 18, DASH_DIM);
+                    DrawTextSmoothCentered(theoretical_complexity_str.c_str(), rightPanelX + 20, 380, 160, 24, DASH_TEXT);
+                }
+            } else if (screen == 2) {
+                // Complexity Text for Search
+                DrawTextSmoothCentered("Time Complexity", rightPanelX + 20, 220, 160, 18, DASH_DIM);
+                DrawTextSmoothCentered("O(log N)", rightPanelX + 20, 250, 160, 24, DASH_TEXT);
+            }
+            
+            // Playback Controls (Bottom Center)
+            int pbY = screenH - 60;
+            int pbCX = screenW / 2;
+            bool prevHover = (mPos.x > pbCX - 150 && mPos.x < pbCX - 70 && mPos.y > pbY && mPos.y < pbY + 40);
+            bool playHover = (mPos.x > pbCX - 60 && mPos.x < pbCX + 60 && mPos.y > pbY && mPos.y < pbY + 40);
+            bool nextHover = (mPos.x > pbCX + 70 && mPos.x < pbCX + 150 && mPos.y > pbY && mPos.y < pbY + 40);
+            
+            // Draw Prev
+            DrawRoundedRect(pbCX - 150, pbY, 80, 40, 0.2f, prevHover ? DASH_ACCENT : DASH_PANEL);
+            DrawRoundedRectLines(pbCX - 150, pbY, 80, 40, 0.2f, 1.0f, DASH_BORDER);
+            DrawTextSmoothCentered("< PREV", pbCX - 150, pbY + 12, 80, 16, prevHover ? DASH_PANEL : DASH_TEXT);
+            
+            // Draw Play/Pause
+            DrawRoundedRect(pbCX - 60, pbY, 120, 40, 0.2f, playHover ? DASH_ACCENT : DASH_PANEL);
+            DrawRoundedRectLines(pbCX - 60, pbY, 120, 40, 0.2f, 1.0f, DASH_BORDER);
+            DrawTextSmoothCentered(playing ? "PAUSE" : "PLAY", pbCX - 60, pbY + 12, 120, 16, playHover ? DASH_PANEL : DASH_ACCENT);
+            
+            // Draw Next
+            DrawRoundedRect(pbCX + 70, pbY, 80, 40, 0.2f, nextHover ? DASH_ACCENT : DASH_PANEL);
+            DrawRoundedRectLines(pbCX + 70, pbY, 80, 40, 0.2f, 1.0f, DASH_BORDER);
+            DrawTextSmoothCentered("NEXT >", pbCX + 70, pbY + 12, 80, 16, nextHover ? DASH_PANEL : DASH_TEXT);
+            
+            // Visual Area Config
+            int areaLeft = leftPanelW + 40;
+            int areaRight = rightPanelX - 40;
+            int areaTop = 160;
+            int areaBottom = screenH - 120;
+            int areaW = areaRight - areaLeft;
+            int areaH = areaBottom - areaTop;
+            
+            // Draw Box around visual area
+            DrawRoundedRectLines(areaLeft - 10, areaTop - 10, areaW + 20, areaH + 20, 0.05f, 2.0f, DASH_BORDER);
+
+            // Draw Real-time Status Log centrally above visual area
+            if (strlen(realtime_status_msg) > 0) {
+                Color msgColor = DASH_DIM;
+                if (screen == 1) {
+                    if (strstr(realtime_status_msg, "Swap") || strstr(realtime_status_msg, "swap") || strstr(realtime_status_msg, "right") || strstr(realtime_status_msg, "left")) msgColor = BAR_SWAPPING;
+                    else if (strstr(realtime_status_msg, "Comparing") || strstr(realtime_status_msg, "comparing") || strstr(realtime_status_msg, "Target") || strstr(realtime_status_msg, "Match")) msgColor = BAR_COMPARING;
+                    if (strstr(realtime_status_msg, "found") || strstr(realtime_status_msg, "Found")) msgColor = BAR_DONE;
+                } else if (screen == 2) {
+                    if (strstr(realtime_status_msg, "Discarding") || strstr(realtime_status_msg, "Moving")) msgColor = SEARCH_BOUNDS;
+                    else if (strstr(realtime_status_msg, "Target") || strstr(realtime_status_msg, "Match")) msgColor = SEARCH_MID;
+                    if (strstr(realtime_status_msg, "found at index")) msgColor = SEARCH_FOUND;
+                    if (strstr(realtime_status_msg, "exhausted")) msgColor = SEARCH_DIM;
+                }
+                
+                int tw = MeasureTextSmooth(realtime_status_msg, 20);
+                DrawRoundedRect((screenW / 2) - (tw / 2) - 20, areaTop - 60, tw + 40, 40, 0.2f, msgColor);
+                DrawTextSmooth(realtime_status_msg, (screenW / 2) - (tw / 2), areaTop - 50, 20, DASH_PANEL);
+            }
+
+            if (screen == 1) {
+                if (steps.empty()) return;
+                Step& cur = steps[currentStep];
+
+                int n = originalArr.size();
+                int maxVal = *max_element(originalArr.begin(), originalArr.end());
+                if (maxVal < 1) maxVal = 1;
+                
+                float exactBarW = (float)areaW / n;
+                float pad = exactBarW * 0.15f; 
+                float t = (playing && currentStep < (int)steps.size() - 1) ? (float)timer / speed : 1.0f;
+                
+                vector<int> currPos(n);
+                for(int p=0; p<n; p++) currPos[cur.indices[p]] = p;
+                
+                vector<int> nextPos = currPos;
+                bool hasNext = (currentStep < (int)steps.size() - 1);
+                if (hasNext) {
+                    for(int p=0; p<n; p++) nextPos[steps[currentStep+1].indices[p]] = p;
+                }
+
+                for (int k = 0; k < n; k++) {
+                    int val = originalArr[k];
+                    float barH = ((float)val / maxVal) * areaH; if (barH < 5) barH = 5;
+                    float p_interp = (float)currPos[k] + t * ((float)nextPos[k] - (float)currPos[k]);
+                    float x = areaLeft + p_interp * exactBarW, y = areaBottom - barH;
+                    
+                    int pos = (t > 0.5f && hasNext) ? nextPos[k] : currPos[k];
+                    Step& colorStep = (t > 0.5f && hasNext) ? steps[currentStep+1] : cur;
+                    
+                    bool stepDone = (colorStep.compared == -1);
+                    Color c = stepDone ? BAR_DONE : BAR_NORMAL;
+                    if (!stepDone) {
+                        bool isActive = (colorStep.compared_sec == -1) ? (pos == colorStep.compared || pos == colorStep.compared + 1) : (pos == colorStep.compared || pos == colorStep.compared_sec);
+                        if (isActive) c = colorStep.swapped ? BAR_SWAPPING : BAR_COMPARING;
+                    }
+                    
+                    DrawRoundedRect((int)(x + pad), (int)y, (int)(exactBarW - pad * 2.0f), (int)barH, 0.25f, c);
+                    Color outlineColor = { (unsigned char)(c.r * 0.8f), (unsigned char)(c.g * 0.8f), (unsigned char)(c.b * 0.8f), c.a };
+                    DrawRoundedRectLines((int)(x + pad), (int)y, (int)(exactBarW - pad * 2.0f), (int)barH, 0.25f, 2.0f, outlineColor);
+
+                    string numStr = to_string(val);
+                    int tw = MeasureTextSmooth(numStr.c_str(), 16);
+                    float tx = (x + pad) + ((exactBarW - pad*2) / 2.0f) - (tw / 2.0f);
+                    float ty = y - 24; 
+                    if (ty < areaTop + 10) ty = y + 10; 
+                    
+                    DrawTextSmooth(numStr.c_str(), (int)tx, (int)ty, 16, DASH_TEXT);
+                }
+                
+                for (int i = 0; i < n; i++) {
+                    string idxStr = to_string(i);
+                    float fixed_x = areaLeft + i * exactBarW;
+                    int iw = MeasureTextSmooth(idxStr.c_str(), 14);
+                    float ix = (fixed_x + pad) + ((exactBarW - pad*2) / 2.0f) - (iw / 2.0f);
+                    DrawTextSmooth(idxStr.c_str(), (int)ix, areaBottom + 8, 14, DASH_DIM);
+                }
+            } else if (screen == 2) {
+                if (searchSteps.empty()) return;
+                SearchStep& cur = searchSteps[currentStep];
+
+                int n = cur.arr.size();
+                if (n == 0) return;
+                
+                float maxBoxW = 60.0f;
+                float exactBoxW = (float)areaW / n;
+                if (exactBoxW > maxBoxW) exactBoxW = maxBoxW;
+                
+                float pad = exactBoxW * 0.1f; 
+                float totalW = n * exactBoxW;
+                float startX = areaLeft + (areaW - totalW) / 2.0f; 
+                float centerY = areaTop + areaH / 2.0f;
+
+                for (int k = 0; k < n; k++) {
+                    int val = cur.arr[k];
+                    float x = startX + k * exactBoxW;
+                    float y = centerY - exactBoxW / 2.0f; 
+                    
+                    Color c = SEARCH_NORMAL; 
+                    
+                    if (cur.done && cur.found && k == cur.mid) {
+                        c = SEARCH_FOUND;
+                    } else if (!cur.done && k >= cur.lo && k <= cur.hi) {
+                        c = SEARCH_NORMAL;
+                    } else if (!cur.done && (k < cur.lo || k > cur.hi)) {
+                        c = SEARCH_DIM; 
+                    } else if (cur.done) {
+                        c = SEARCH_DIM; 
+                    }
+                    
+                    if (!cur.done) {
+                        if (k == cur.lo) c = SEARCH_BOUNDS;
+                        if (k == cur.hi) c = SEARCH_BOUNDS;
+                        if (k == cur.mid) c = SEARCH_MID;
+                    }
+                    
+                    DrawRoundedRect((int)(x + pad), (int)(y + pad), (int)(exactBoxW - pad * 2.0f), (int)(exactBoxW - pad * 2.0f), 0.15f, c);
+                    Color outlineColor = { (unsigned char)(c.r * 0.8f), (unsigned char)(c.g * 0.8f), (unsigned char)(c.b * 0.8f), c.a };
+                    DrawRoundedRectLines((int)(x + pad), (int)(y + pad), (int)(exactBoxW - pad * 2.0f), (int)(exactBoxW - pad * 2.0f), 0.15f, 2.0f, outlineColor);
+
+                    string numStr = to_string(val);
+                    int fs = (int)(exactBoxW * 0.4f); if (fs < 10) fs = 10;
+                    int tw = MeasureTextSmooth(numStr.c_str(), fs);
+                    float tx = (x + exactBoxW / 2.0f) - (tw / 2.0f);
+                    float ty = y + exactBoxW / 2.0f - fs / 2.0f;
+                    DrawTextSmooth(numStr.c_str(), (int)tx, (int)ty, fs, DASH_TEXT);
+                    
+                    string idxStr = to_string(k);
+                    int iw = MeasureTextSmooth(idxStr.c_str(), 14);
+                    float ix = (x + exactBoxW / 2.0f) - (iw / 2.0f);
+                    DrawTextSmooth(idxStr.c_str(), (int)ix, (int)(y - 25), 14, DASH_DIM);
+                    
+                    if (!cur.done) {
+                        int labelY_bot = y + exactBoxW + 10; 
+                        if (k == cur.lo) DrawTextSmoothCentered("lo", (int)x, labelY_bot, (int)exactBoxW, 16, SEARCH_BOUNDS);
+                        if (k == cur.hi) DrawTextSmoothCentered("hi", (int)x, labelY_bot + 20, (int)exactBoxW, 16, SEARCH_BOUNDS);
+                        if (k == cur.mid) DrawTextSmoothCentered("mid", (int)x, labelY_bot, (int)exactBoxW, 16, SEARCH_MID);
+                    }
+                }
+            }
+        } else if (screen == 3) {
+            ClearBackground(DASH_BG);
+            Vector2 mPos = GetMousePosition();
+            drawDashboardTopBar(screenW, mPos);
+            
+            if (graphSteps.empty()) return;
+            GraphStep& cur = graphSteps[currentStep];
+            
+            if (cur.done) {
+                DrawTextSmooth("COMPLETE", screenW - 200, 80, 26, BAR_DONE);
+            }
+
+            int areaTop = 140;
+            int areaBottom = screenH - 40;
+            int availH = areaBottom - areaTop;
+            int availW = screenW - 40;
+            float offsetX = 20.0f;
+            float offsetY = areaTop;
+
+            auto getNodePos = [&](int idx) -> Vector2 {
+                return { offsetX + graphNodes[idx].x * availW, offsetY + graphNodes[idx].y * availH };
+            };
+
+            for (size_t i = 0; i < graphNodes.size(); i++) {
+                Vector2 p1 = getNodePos(i);
+                if (graphNodes[i].leftId != -1) {
+                    Vector2 p2 = getNodePos(graphNodes[i].leftId);
+                    DrawLineEx(p1, p2, 3.0f, DASH_BORDER);
+                }
+                if (graphNodes[i].rightId != -1) {
+                    Vector2 p2 = getNodePos(graphNodes[i].rightId);
+                    DrawLineEx(p1, p2, 3.0f, DASH_BORDER);
+                }
+            }
+
+            float nodeRadius = 24.0f;
+            if (graphNodes.size() > 30) nodeRadius = 18.0f;
+            if (graphNodes.size() > 60) nodeRadius = 14.0f;
+
+            for (size_t i = 0; i < graphNodes.size(); i++) {
+                Vector2 pos = getNodePos(i);
+                Color c = DASH_PANEL;
+                Color borderC = DASH_BORDER;
+                Color textC = DASH_TEXT;
+                
+                if (find(cur.visitedSequence.begin(), cur.visitedSequence.end(), i) != cur.visitedSequence.end()) {
+                    c = BAR_DONE; borderC = BAR_DONE; textC = DASH_PANEL;
+                } else if (find(cur.activeStack.begin(), cur.activeStack.end(), i) != cur.activeStack.end()) {
+                    c = BAR_SWAPPING; borderC = BAR_SWAPPING; textC = DASH_PANEL;
+                }
+
+                if (cur.currentId == i && !cur.done) {
+                    c = BAR_COMPARING; borderC = BAR_COMPARING; textC = DASH_TEXT;
+                }
+
+                DrawCircleV(pos, nodeRadius + 3.0f, borderC); 
+                DrawCircleV(pos, nodeRadius, c); 
+
+                int fontSize = (int)(nodeRadius * 1.2f);
+                string valStr = to_string(graphNodes[i].value);
+                DrawTextSmoothCentered(valStr.c_str(), (int)(pos.x - nodeRadius), (int)(pos.y - fontSize*0.4f), (int)(nodeRadius*2), fontSize, textC);
+            }
+        }
+    }
+};
+
+#endif // APP_H
